@@ -21,4 +21,15 @@ Le retour aura cette forme:
 ```
 La liste de mots-clés contiendra un nombre plus ou moins important de propositions et pourra être vide si aucun mot-clé pertinent ne puisse être trouvé pour la question écrite.
 # Contenu du projet
-README.md
+```
+.
+├── main.py
+├── mlbs
+│   └── mlb.pkl
+├── models
+│   └── model.pkl
+├── README.md
+├── requirements.txt
+└── tests
+    └── test_main.py
+```
