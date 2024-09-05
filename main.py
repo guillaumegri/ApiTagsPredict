@@ -19,13 +19,16 @@ model = joblib.load('models/model.pkl')
 @app.route('/predict', methods=['POST'])
 def predict():
     data = request.json
+    if 'text' not in data:
+        return jsonify({'error': 'Missing text key in JSON payload'}), 400
     texts = data['text']
+    
     embedding = embed_model(texts).numpy()
     
     tags = model.predict(embedding)
     tags = mlb.inverse_transform(tags)
     
-    return jsonify({'keywords': tags})
+    return jsonify({'tags': tags[0]})
 
 if __name__ == '__main__':
     app.run(debug=True, port=8000)
