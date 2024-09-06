@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: CI/CD
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,7 +19,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.10'
+        python-version: '3.11'
 
     - name: Install dependencies
       run: |
@@ -29,10 +29,3 @@ jobs:
     - name: Run tests
       run: |
         pytest --maxfail=1 --disable-warnings -q
-
-    - name: Deploy
-      if: success() # Déploye uniquement si les tests réussissent
-      run: |
-        echo "Déploiement en cours..."
-        # Ajoute ici les commandes pour déployer ton application
-        # Par exemple, déployer sur Heroku, Azure, ou un autre service cloud
