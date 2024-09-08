@@ -21,6 +21,10 @@ def predict():
         return jsonify({'error': 'Missing text key in JSON payload'}), 400
     texts = data['text']
 
+    # Si texts est une chaîne de caractères on la convertit en liste de chaîne de caractères
+    if isinstance(texts, str):
+        texts = [texts] 
+    
     embedding = embed_model(texts).numpy()
     
     tags = model.predict(embedding)
