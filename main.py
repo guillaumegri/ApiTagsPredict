@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 import joblib
 import tensorflow_hub as hub
+import os
 
 # URL du modèle Universal Sentence Encoder
 model_url = "https://www.kaggle.com/models/google/universal-sentence-encoder/TensorFlow2/universal-sentence-encoder/2"
