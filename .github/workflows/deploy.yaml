@@ -28,8 +28,21 @@ jobs:
 
       - name: Package application
         run: |
-          git archive -o lambda_function.zip HEAD # Crée une archive ZIP en respectant .gitignore
+          git archive -o source_code.zip HEAD # Crée une archive ZIP en respectant .gitignore
+      
+      - name: Unzip source code
+        run: |
+          mkdir -p /tmp/package
+          unzip source_code.zip -d /tmp/package
 
+      - name: Install dependencies
+        run: |
+          pip install --target /tmp/package -r requirements.txt
+
+      - name: Create final deployment package
+        run: |
+          cd /tmp/package
+          zip -r lambda_function.zip .
       - name: Deploy to AWS Lambda
         uses: appleboy/lambda-action@master
         with:
