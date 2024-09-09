@@ -41,8 +41,7 @@ jobs:
 
       - name: Create final deployment package
         run: |
-          cd /tmp/package
-          zip -r lambda_function.zip .
+          zip -r lambda_function.zip /tmp/package/.
       - name: Deploy to AWS Lambda
         uses: appleboy/lambda-action@master
         with:
@@ -50,4 +49,4 @@ jobs:
           function_name: 'predict'
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws_region: 'eu-west-3' # Spécifiez la région AWS appropriée
+          aws_region: 'eu-west-3'
