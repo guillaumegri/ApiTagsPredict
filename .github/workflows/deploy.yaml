@@ -1,8 +1,8 @@
-name: Deploy
+name: Deploy to AWS Lambda
 
 on:
   workflow_run:
-    workflows: ["CI/CD"] # Ce nom doit correspondre au nom défini dans `ci.yaml`
+    workflows: ["CI/CD"] # Nom du workflow de CI que vous surveillez
     types:
       - completed
 
@@ -10,22 +10,32 @@ jobs:
   deploy:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 1 # Assure que seul le dernier commit est récupéré
 
       - name: Set up Python
         uses: actions/setup-python@v3
         with:
-          python-version: '3.11'
-    
-      - name: Login to Azure
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          python-version: 3.11
 
-      - name: Deploy to Azure App Service
-        uses: Azure/webapps-deploy@v2
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Package application
+        run: |
+          git archive -o lambda_function.zip HEAD # Crée une archive ZIP en respectant .gitignore
+
+      - name: Deploy to AWS Lambda
+        uses: aws-actions/aws-lambda-deploy@v1
         with:
-          app-name: 'ApiTagsPredict'
+          function-name: 'my-lambda-function'
+          zip-file: 'lambda_function.zip'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: 'us-east-1' # Spécifiez la région AWS appropriée

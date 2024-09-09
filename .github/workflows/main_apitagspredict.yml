@@ -5,13 +5,14 @@
 name: Build and deploy Python app to Azure Web App - ApiTagsPredict
 
 on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
+  workflow_run:
+    workflows: ["CI/CD"] # Nom du workflow de CI que vous surveillez
+    types:
+      - completed
 
 jobs:
   build:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
