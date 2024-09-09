@@ -31,11 +31,11 @@ jobs:
           git archive -o lambda_function.zip HEAD # Crée une archive ZIP en respectant .gitignore
 
       - name: Deploy to AWS Lambda
-        uses: aws-actions/aws-lambda-deploy@v1
+        uses: appleboy/lambda-action@master
         with:
           function-name: 'my-lambda-function'
           zip-file: 'lambda_function.zip'
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: 'us-east-1' # Spécifiez la région AWS appropriée
+          AWS_REGION: 'eu-west-3' # Spécifiez la région AWS appropriée
