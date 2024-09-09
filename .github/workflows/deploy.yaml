@@ -33,7 +33,6 @@ jobs:
       - name: Deploy to AWS Lambda
         uses: appleboy/lambda-action@master
         with:
-          function_name: 'my-lambda-function'
           zip_file: 'lambda_function.zip'
           function_name: 'predict'
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
