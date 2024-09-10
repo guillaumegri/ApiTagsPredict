@@ -25,12 +25,12 @@ def predict():
     if isinstance(texts, str):
         texts = [texts] 
     
-    embedding = embed_model(texts).numpy()
+    # embedding = embed_model(texts).numpy()
     
-    tags = model.predict(embedding)
-    tags = mlb.inverse_transform(tags)
+    # tags = model.predict(embedding)
+    # tags = mlb.inverse_transform(tags)
     
-    return jsonify({'tags': tags[0]})
+    return jsonify({'tags': [texts]})
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8000))  # Azure définira la variable PORT
