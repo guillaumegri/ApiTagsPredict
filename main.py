@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 # import joblib
-# import tensorflow_hub as hub
+import tensorflow_hub as hub
 import os
 
 # # URL du modèle Universal Sentence Encoder
