@@ -3,9 +3,9 @@ from flask import Flask, request, jsonify
 import tensorflow_hub as hub
 import os
 
-# # URL du modèle Universal Sentence Encoder
-# model_url = "https://www.kaggle.com/models/google/universal-sentence-encoder/TensorFlow2/universal-sentence-encoder/2"
-# embed_model = hub.KerasLayer(model_url)
+# URL du modèle Universal Sentence Encoder
+model_url = "https://www.kaggle.com/models/google/universal-sentence-encoder/TensorFlow2/universal-sentence-encoder/2"
+embed_model = hub.KerasLayer(model_url)
 
 # mlb = joblib.load('mlbs/mlb.pkl')
 
