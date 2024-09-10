@@ -30,7 +30,7 @@ def predict():
     # tags = model.predict(embedding)
     # tags = mlb.inverse_transform(tags)
     
-    return jsonify({'tags': [texts]})
+    return jsonify({'tags': texts})
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8000))  # Azure définira la variable PORT
