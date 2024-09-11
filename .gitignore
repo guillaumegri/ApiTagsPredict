@@ -3,3 +3,5 @@ __pycache__/
 *.pyo
 *.pyd
 api_tags_predict_env
+.pipreqsignore
+python_files.txt
