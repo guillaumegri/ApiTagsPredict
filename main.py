@@ -110,7 +110,7 @@ if type_vectorizer == "use":
     model_url = "https://www.kaggle.com/models/google/universal-sentence-encoder/TensorFlow2/universal-sentence-encoder/2"
     vectorizer_model = hub.KerasLayer(model_url)
 elif type_vectorizer == "tfidf":
-    vectorizer_model = joblib('vectorizers/tfidf_vectorizer.pkl')
+    vectorizer_model = joblib.load('vectorizers/tfidf_vectorizer.pkl')
 
 mlb = joblib.load('mlbs/mlb.pkl')
 
