@@ -5,6 +5,7 @@ import tensorflow_hub as hub
 import os
 import multiprocessing
 from multiprocessing import Manager, Pool
+import nltk
 from nltk.corpus import wordnet
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
