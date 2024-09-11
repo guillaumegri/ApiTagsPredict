@@ -13,6 +13,12 @@ from nltk import pos_tag
 import re
 from preprocessing import identity
 
+nltk.download('stopwords')
+nltk.download('wordnet')
+nltk.download('punkt')
+nltk.download('punkt_tab')
+nltk.download('averaged_perceptron_tagger_eng')
+
 def get_wordnet_pos(tag):
     """
     Convertit un tag de partie du discours (POS) en un format compatible avec WordNetLemmatizer.
