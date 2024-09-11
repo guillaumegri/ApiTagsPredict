@@ -11,6 +11,9 @@ from nltk.corpus import stopwords
 from nltk import pos_tag
 import re
 
+def identity(x):
+    return x
+
 def get_wordnet_pos(tag):
     """
     Convertit un tag de partie du discours (POS) en un format compatible avec WordNetLemmatizer.
