@@ -10,9 +10,7 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk import pos_tag
 import re
-
-def identity(x):
-    return x
+from preprocessing import identity
 
 def get_wordnet_pos(tag):
     """

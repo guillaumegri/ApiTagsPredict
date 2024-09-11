@@ -7,9 +7,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import pytest
 from main import app
 
-def identity(x):
-    return x
-
 @pytest.fixture
 def client():
     app.config['TESTING'] = True
