@@ -5,3 +5,8 @@ __pycache__/
 api_tags_predict_env
 .pipreqsignore
 python_files.txt
+requirements.txt.bak
+Pipfile
+Pipfile.lock
+all_installed.txt
+unnecessary_modules.txt
