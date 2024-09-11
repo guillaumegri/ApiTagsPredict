@@ -1,36 +1,151 @@
 from flask import Flask, request, jsonify
-# import joblib
+import joblib
 import tensorflow_hub as hub
 import os
+import multiprocessing
+from multiprocessing import Manager, Pool
+from nltk.corpus import wordnet
+from nltk.stem import WordNetLemmatizer
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+from nltk import pos_tag
+import re
 
-# URL du modèle Universal Sentence Encoder
-model_url = "https://www.kaggle.com/models/google/universal-sentence-encoder/TensorFlow2/universal-sentence-encoder/2"
-embed_model = hub.KerasLayer(model_url)
+def get_wordnet_pos(tag):
+    """
+    Convertit un tag de partie du discours (POS) en un format compatible avec WordNetLemmatizer.
 
-# mlb = joblib.load('mlbs/mlb.pkl')
+    Args:
+        tag (str): Tag de partie du discours (POS) fourni par pos_tag.
+
+    Returns:
+        wordnet.POS: POS compatible avec WordNetLemmatizer.
+    """
+    if tag.startswith('J'):
+        return wordnet.ADJ
+    elif tag.startswith('V'):
+        return wordnet.VERB
+    elif tag.startswith('N'):
+        return wordnet.NOUN
+    elif tag.startswith('R'):
+        return wordnet.ADV
+    else:
+        return wordnet.NOUN
+
+def clean_token(token):
+    """
+    Nettoie un token en supprimant les symboles et les chiffres.
+
+    Args:
+        token (str): Le token à nettoyer.
+
+    Returns:
+        str: Le token nettoyé.
+    """
+    token = re.sub(r'[^\w\s]', '', token)  # Supprimer la ponctuation
+    token = re.sub(r'\d', '', token)       # Supprimer les chiffres
+    return token
+
+def preprocess_text(text):
+    """
+    Prétraite un texte en effectuant des opérations telles que la substitution de certains termes,
+    la tokenisation, le POS tagging, le lemmatisation et la suppression des stopwords.
+
+    Args:
+        text (str): Le texte à prétraiter.
+
+    Returns:
+        list of str: Liste de tokens lemmatisés et filtrés.
+    """
+    # Initialiser le lemmatizer
+    lemmatizer = WordNetLemmatizer()
+
+    # Liste des langues et technologies à remplacer
+    languages_and_technologies = [
+        "C#", "C", "C++", "R", "Go", "VB", "F#", "JS", "D", "ML", "J#", "PL/I", "PL/SQL"
+    ]
+
+    substitutions = [
+        (r"C\+\+", "cplusplus"),
+        (r"C\#", "csharp"),
+        (r"F\#", "fsharp"),
+        (r"J\#", "jsharp"),
+        (r"PL\/I", "pldashi"),
+        (r"PL\/SQL", "pldashsql")
+    ]
+
+    reverse_substitutions = {v: re.sub(r'\\', '', k).lower() for k, v in substitutions}
+
+    for language, remplacement in substitutions:
+        text = re.sub(language, remplacement, text)
+
+    # Tokenisation
+    words = word_tokenize(text.lower())  # Convertit en minuscules pour une cohérence
+
+    # POS tagging pour garder seulement les noms et les verbes
+    tagged_words = pos_tag(words)
+
+    lemmatized_tokens = []
+    for token, pos in tagged_words:
+        cleaned_token = clean_token(token)
+        if cleaned_token:  # Vérifier que le token n'est pas vide après nettoyage
+            lemmatized_token = lemmatizer.lemmatize(cleaned_token, get_wordnet_pos(pos))
+            lemmatized_tokens.append(lemmatized_token)
+
+    stop_words = set(stopwords.words('english'))
+    filtered_lemmatized_tokens = [
+        token for token in lemmatized_tokens
+        if token not in stop_words
+        and (len(token) > 2 or token in languages_and_technologies)
+    ]
+
+    filtered_lemmatized_tokens = [reverse_substitutions.get(token, token) for token in filtered_lemmatized_tokens]
+
+    return filtered_lemmatized_tokens
+
+type_vectorizer = "tfidf"
+
+if type_vectorizer == "use":
+    # URL du modèle Universal Sentence Encoder
+    model_url = "https://www.kaggle.com/models/google/universal-sentence-encoder/TensorFlow2/universal-sentence-encoder/2"
+    vectorizer_model = hub.KerasLayer(model_url)
+elif type_vectorizer == "tfidf":
+    vectorizer_model = joblib('vectorizers/tfidf_vectorizer.pkl')
+
+mlb = joblib.load('mlbs/mlb.pkl')
 
 app = Flask(__name__)
 
-# # Chargement du modèle de prédiction
-# model = joblib.load('models/model.pkl')
+# Chargement du modèle de prédiction
+model = joblib.load('models/model.pkl')
     
 @app.route('/predict', methods=['POST'])
 def predict():
     data = request.json
+
     if 'text' not in data:
         return jsonify({'error': 'Missing text key in JSON payload'}), 400
-    texts = data['text']
+    
+    if(type_vectorizer == 'use'):
+        texts = data['text']
 
-    # Si texts est une chaîne de caractères on la convertit en liste de chaîne de caractères
-    if isinstance(texts, str):
-        texts = [texts] 
+        # Si texts est une chaîne de caractères on la convertit en liste de chaîne de caractères
+        if isinstance(texts, str):
+            texts = [texts]        
+
+        X = vectorizer_model(texts).numpy()
+        
+        
+    elif(type_vectorizer == 'tfidf'):
+        if  not isinstance(text, str):
+            text = " ".join(data['text'])
+
+        X = preprocess_text(text)
+
+    tags = model.predict(X)
+    tags = mlb.inverse_transform(tags)    
     
-    embedding = embed_model(texts).numpy()
-    
-    # tags = model.predict(embedding)
-    # tags = mlb.inverse_transform(tags)
-    
-    return jsonify({'tags': embedding})
+    return jsonify({'tags': tags})
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8000))  # Azure définira la variable PORT
