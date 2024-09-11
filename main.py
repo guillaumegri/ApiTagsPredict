@@ -128,8 +128,9 @@ def predict():
     if 'text' not in data:
         return jsonify({'error': 'Missing text key in JSON payload'}), 400
     
-    if(type_vectorizer == 'use'):
-        texts = data['text']
+    texts = data['text']
+
+    if(type_vectorizer == 'use'):        
 
         # Si texts est une chaîne de caractères on la convertit en liste de chaîne de caractères
         if isinstance(texts, str):
@@ -139,8 +140,8 @@ def predict():
         
         
     elif(type_vectorizer == 'tfidf'):
-        if  not isinstance(text, str):
-            text = " ".join(data['text'])
+        if  not isinstance(texts, str):
+            text = " ".join(texts)
 
         X = preprocess_text(text)
 
