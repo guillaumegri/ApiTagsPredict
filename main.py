@@ -151,7 +151,7 @@ def predict():
             text = " ".join(texts)
 
         preprocessed_text = preprocess_text(text)
-        X = vectorizer_model(X)
+        X = vectorizer_model(preprocessed_text)
 
     tags = model.predict(X)
     tags = mlb.inverse_transform(tags)    
