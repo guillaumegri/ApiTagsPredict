@@ -150,7 +150,8 @@ def predict():
         if  not isinstance(texts, str):
             text = " ".join(texts)
 
-        X = preprocess_text(text)
+        preprocessed_text = preprocess_text(text)
+        X = vectorizer_model(X)
 
     tags = model.predict(X)
     tags = mlb.inverse_transform(tags)    
