@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, current_app
 import mlflow
 import joblib
 import tensorflow_hub as hub
@@ -19,6 +19,8 @@ nltk.download('wordnet')
 nltk.download('punkt')
 nltk.download('punkt_tab')
 nltk.download('averaged_perceptron_tagger_eng')
+
+app = Flask(__name__)
 
 def get_wordnet_pos(tag):
     """
@@ -121,13 +123,11 @@ if type_vectorizer == "use":
 elif type_vectorizer == "tfidf":
     vectorizer_model = joblib.load('vectorizers/tfidf_vectorizer.pkl')
 
+# Chargement du modèle de prédiction
+model = joblib.load(f'models/{type_vectorizer}_model.pkl')
+
 mlb = joblib.load('mlbs/mlb.pkl')
 
-app = Flask(__name__)
-
-# Chargement du modèle de prédiction
-model = joblib.load('models/model.pkl')
-    
 @app.route('/predict', methods=['POST'])
 def predict():
     data = request.json
@@ -136,9 +136,9 @@ def predict():
         return jsonify({'error': 'Missing text key in JSON payload'}), 400
     
     texts = data['text']
-
+    # Preprocessing du texte
     if(type_vectorizer == 'use'):        
-
+        # Avec un embedding Universal Sentence Encoder
         # Si texts est une chaîne de caractères on la convertit en liste de chaîne de caractères
         if isinstance(texts, str):
             texts = [texts]        
@@ -147,15 +147,20 @@ def predict():
         
         
     elif(type_vectorizer == 'tfidf'):
+        # Avec une vectorisation TF-IDF
         if  not isinstance(texts, str):
             text = " ".join(texts)
 
         preprocessed_text = preprocess_text(text)
-        X = vectorizer_model(preprocessed_text)
 
+        X = vectorizer_model.transform([preprocessed_text]).toarray()
+
+    # Prédiction des tags et inversion de la binarisation pour retrouver les mots réels
     tags = model.predict(X)
+
     tags = mlb.inverse_transform(tags)    
-    
+    tags = [tag for sublist in tags for tag in sublist]
+
     return jsonify({'tags': tags})
 
 if __name__ == '__main__':

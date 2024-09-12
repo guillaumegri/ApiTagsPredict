@@ -26,12 +26,13 @@ def test_predict(client):
         response = client.post('/predict', json=data_1)
         # Récupérer le contenu JSON de la réponse 1
         response_json = response.get_json()
-
+        print(response_json)
         assert response_json == {"tags": []}
-
+        print(response_json)
         response = client.post('/predict', json=data_2)
     
         # Récupérer le contenu JSON de la réponse 2 
         response_json = response.get_json()
 
         assert response_json == {"tags": ["python"]}
+        print(response_json)
