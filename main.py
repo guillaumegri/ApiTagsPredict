@@ -88,8 +88,8 @@ def preprocess_text(text):
     reverse_substitutions = {v: re.sub(r'\\', '', k).lower() for k, v in substitutions}
 
     for language, remplacement in substitutions:
-        text = re.sub(language, remplacement, text)
-
+        text = re.sub(language, remplacement, text, flags=re.IGNORECASE)
+    
     # Tokenisation
     words = word_tokenize(text.lower())  # Convertit en minuscules pour une cohérence
 
